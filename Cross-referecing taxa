@@ -65,9 +65,9 @@ result_qval.to_csv('../result_qval.tsv', sep='\t', index=False)
 #com os datasets dos taxons aumentados e os taxons correspondentes
 
 # Lendo o DataFrame de lfc a partir do arquivo CSV
-df_lfc = pd.read_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_lfc.tsv', sep='\t')
-df_pval = pd.read_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_pval.tsv', sep='\t')
-df_qval = pd.read_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_qval.tsv', sep='\t')
+df_lfc = pd.read_csv('../result_lfc.tsv', sep='\t')
+df_pval = pd.read_csv('../result_pval.tsv', sep='\t')
+df_qval = pd.read_csv('../result_qval.tsv', sep='\t')
 
 # Filtrando os valores positivos de lfc (sempre pela coluna de log-fold-change) e renomear nomes das colunas
 df_lfc_enriched = df_lfc[df_lfc['diagnosisSZ_lfc'] > 0].copy()
