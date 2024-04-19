@@ -264,6 +264,7 @@ df_final = df_unico[['Taxa', 'Contagem', 'Presenca']]
 print(df_final)
 
 # Definindo o caminho completo para o arquivo TSV
+# Mudar o nome conforme arquivo
 caminho_do_arquivo = '../tabela-final-ancombc-adultos-sem-filtro.tsv'
 
 # Salvando o DataFrame df_filtrado no arquivo TSV especificado
