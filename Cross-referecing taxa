@@ -107,7 +107,7 @@ df_pval_depleted.to_csv('../df_pval_depleted.tsv', sep='\t', index=False)
 df_qval_enriched.to_csv('../df_qval_enriched.tsv', sep='\t', index=False)
 df_qval_depleted.to_csv('../df_qval_depleted.tsv', sep='\t', index=False)
 
-#---------------Essa parte irá juntar os diferentes arquivos com os datasets e taxons aumentados/diminuídos para criar uma tabelona com todos os taxons aumentados e diminuídos
+#---------------Essa parte irá juntar os diferentes arquivos com os datasets e taxons aumentados/diminuídos para criar uma tabelona com todos os taxons aumentados e diminuídos (fazer individualmente para log-fold-change,pval e qval)
 
 # Caminhos para os arquivos CSV
 caminho_enriched_1 = '../df_lfc_enriched.tsv'
