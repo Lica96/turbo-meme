@@ -1,0 +1,66 @@
+#---------------Esse script irá ler os arquivos do ancombc, excluir colunas indesejadas e aplicar filtro (p-value e q-value)
+#em conjunto com o log-fold-change 
+
+
+import pandas as pd
+
+#Transformar ancombc em csv pelo qiime2, ele irá gerar lfc_slice.csv;p_val_slice.csv;q_val_slice.csv
+#bash linux
+#qiime tools export --input-path ancombc-fdr-adjusted.qza --output-path ancombc_csv
+
+
+# Substitua 'planilha1.xlsx', 'planilha2.xlsx', 'planilha3.xlsx' pelos caminhos das suas planilhas
+# e 'colunaA', 'colunaB', etc., pelos nomes reais das colunas que você deseja extrair.
+
+# Leitura das planilhas em tsv usando sep='\t'
+df1 = pd.read_csv('../lfc_slice.csv', sep=',')
+df2 = pd.read_csv('../p_val_slice.csv', sep=',')
+df3 = pd.read_csv('../q_val_slice.csv', sep=',')
+
+# Adicionando uma nova coluna 'Dataset' na primeira posição
+#se tiver várias variáveis no mesmo dataset, colocar além do nome do dataset qual a variável. ex: PRJNA.._crypto
+df1.insert(0, 'Dataset', 'PRJEB26004')
+df2.insert(0, 'Dataset', 'PRJEB26004')
+df3.insert(0, 'Dataset', 'PRJEB26004')
+
+#Excluindo as colunas indesejadas
+
+# Excluir múltiplas colunas
+# Nos bebês também precisou excluir outras que foram criadas pq na tabela de metadados estava vazio:
+# df1 = df1.drop(['(Intercept)', 'Group_Helm_Pro'], axis=1)
+
+df1 = df1.drop(['(Intercept)'], axis=1)
+df2 = df2.drop(['(Intercept)'], axis=1)
+df3 = df3.drop(['(Intercept)'], axis=1)
+
+#Renomear as colunas para depois que der merge não virar _x e _y
+
+# Renomear colunas usando .rename()
+df1 = df1.rename(columns={'diagnosisSZ': 'diagnosisSZ_lfc'})
+df2 = df2.rename(columns={'diagnosisSZ': 'diagnosisSZ_pval'})
+df3 = df3.rename(columns={'diagnosisSZ': 'diagnosisSZ_qval'})
+
+# Extração das colunas da Planilha 1
+# Substituir pelos nomes das colunas 
+df1_extracted = df1[['id', 'diagnosisSZ_lfc']]
+
+df1_filtered = df1.sort_values(by='diagnosisSZ_lfc', ascending=False)
+
+# Extração da coluna da Planilha 2 e aplicação do filtro
+df2_extracted_filtered = df2[['id', 'diagnosisSZ_pval']][df2['diagnosisSZ_pval'] < 0.05]
+
+# Extração da coluna da Planilha 3 e aplicação do filtro
+df3_extracted_filtered = df3[['id', 'diagnosisSZ_qval']][df3['diagnosisSZ_qval'] < 0.2]
+
+# (Opcional) Combinação dos dados extraídos e filtrados em um novo DataFrame
+# Isso pressupõe que você tenha uma coluna comum para realizar a junção (merge), como um ID.
+# Se não for o caso, você precisará ajustar este passo conforme sua necessidade específica.
+
+# Exemplo de combinação com base em um 'ID' comum (ajuste conforme necessário)
+result_pval = pd.merge(df1_filtered, df2_extracted_filtered, on='id')
+result_qval = pd.merge(df1_filtered, df3_extracted_filtered, on='id')
+
+# Exportar o DataFrame resultante para um novo arquivo Excel ou CSV, se necessário
+df1_filtered.to_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_lfc.tsv', sep='\t', index=False)
+result_pval.to_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_pval.tsv', sep='\t', index=False)
+result_qval.to_csv('/work/microbiomapsi/liviacmg/datasetsadultos/adultPRJEB26004/output/ancombc_csv/result_qval.tsv', sep='\t', index=False)
