@@ -1,0 +1,36 @@
+import pandas as pd
+
+# Carregando os dados
+df1 = pd.read_csv('../final_result_pval.tsv', sep='\t')
+
+# Inicializando listas para armazenar os dados extraídos
+phylum_list = []
+family_list = []
+genus_list = []
+
+# Iterando sobre cada linha do DataFrame"
+for index, row in df1.iterrows():
+ taxa = row['Taxa']
+# Extraindo as partes desejadas da string 'Taxa'
+ phylum = taxa.split(';')[1][3:]  # Remove 'p__'
+ family = taxa.split(';')[4][3:]  # Remove 'f__'
+ genus = taxa.split(';')[5][3:]   # Remove 'g__'
+
+# Adicionando os dados extraídos às listas
+ phylum_list.append(phylum)
+ family_list.append(family)
+ genus_list.append(genus)
+
+
+# Criando um novo DataFrame com as colunas extraídas e a coluna 'presence'
+new_df = pd.DataFrame({
+ 'phylum': phylum_list,
+ 'family': family_list,
+ 'genus': genus_list,
+ 'presence': df1['Presence']
+})
+  
+# Exibindo as primeiras linhas do novo DataFrame
+print(new_df.head())
+
+new_df.to_csv('../filtered_pval.tsv', index=False, sep='\t')
