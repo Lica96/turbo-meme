@@ -27,7 +27,9 @@ new_df = pd.DataFrame({
  'phylum': phylum_list,
  'family': family_list,
  'genus': genus_list,
- 'presence': df1['Presence']
+ 'presence': df1['Presence'],
+ 'bebes': df1['Contagem_df1'].astype(str) + ' out of 5',
+ 'adultos': df1['Contagem_df2'].astype(str) + ' out of 6'
 })
   
 # Exibindo as primeiras linhas do novo DataFrame
