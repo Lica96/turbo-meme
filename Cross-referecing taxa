@@ -169,15 +169,6 @@ df_final = pd.concat([df_enriched_merged.reset_index(drop=True), df_depleted_mer
 caminho_final_tsv = '../final_merged_data.tsv'
 df_final.to_csv(caminho_final_tsv, sep='\t', index=False)
 
-
-
-
-
-#---------- A partir daqui para baixo está errado 
-
-
-
-
 #---------------Essa parte irá calcular os taxons consistentes, ou seja: vai ler as colunas de taxons aumentados e diminuídos, cruzar ambas individualmente e uma contra a outra e retornar na coluna "Presenca" se o taxon está aumentado e/ou diminuído
 
 df = pd.read_csv('../final_merged_data.tsv', sep='\t')
