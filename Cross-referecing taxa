@@ -270,7 +270,7 @@ caminho_do_arquivo = '../tabela-final-ancombc-adultos-sem-filtro.tsv'
 # Salvando o DataFrame df_filtrado no arquivo TSV especificado
 df_final.to_csv(caminho_do_arquivo, sep='\t', index=False)
 
-#---------------Essa parte irá cruzar o dataframe final de bebês vs adultos e retornar apenas os taxons consistentes
+#---------------Essa parte irá cruzar o dataframe final de bebês vs adultos 
 
 import pandas as pd
 
@@ -300,3 +300,38 @@ if 'Presenca' in df1.columns and 'Presenca' in df2.columns:
     final_df.to_csv('../final_result.tsv', sep='\t', index=False)
 else:
     print('A coluna "Presenca" não está presente em ambos os DataFrames.')
+
+#---------------Essa parte irá cruzar os dataframes já cruzados (bebês vs adultos) para retornar apenas os taxons consistentes
+
+import pandas as pd
+import numpy as np
+
+# Carregar os DataFrames
+df1 = pd.read_csv('../final_result_pval.tsv', sep='\t')
+df2 = pd.read_csv('../final_result_qval.tsv', sep='\t')
+df3 = pd.read_csv('../final_result_semfiltro.tsv', sep='\t')
+
+# Verificar se a coluna 'Presence' está presente em todos os DataFrames
+if 'Presence' in df1.columns and 'Presence' in df2.columns and 'Presence' in df3.columns:
+    # Primeira mesclagem entre df1 e df2
+    merged_df1_df2 = pd.merge(df1, df2, on='Taxa', suffixes=('_df1', '_df2'))
+    
+    # Segunda mesclagem entre o resultado da primeira mesclagem e df3
+    final_merged_df = pd.merge(merged_df1_df2, df3, on='Taxa', suffixes=('', '_df3'))
+
+    # Criar as condições e escolhas para a nova coluna 'Presence'
+    conditions = [
+        (final_merged_df['Presence_df1'] == 'Depleted in both') & 
+        (final_merged_df['Presence_df2'] == 'Depleted in both') & 
+        (final_merged_df['Presence'] == 'Depleted in both'),
+    ]
+    choices = ['Depleted in both']
+    final_merged_df['Presence'] = np.select(conditions, choices, default='Not present in both')
+
+    # Manter apenas as colunas desejadas
+    final_df = final_merged_df[['Taxa', 'Contagem_df1', 'Contagem_df2', 'Presence']]
+
+    # Salvar o resultado final
+    final_df.to_csv('../consistent_taxas.tsv', sep='\t', index=False)
+else:
+    print('A coluna "Presenca" não está presente em todos os DataFrames.')
