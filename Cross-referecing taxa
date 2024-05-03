@@ -169,6 +169,15 @@ df_final = pd.concat([df_enriched_merged.reset_index(drop=True), df_depleted_mer
 caminho_final_tsv = '../final_merged_data.tsv'
 df_final.to_csv(caminho_final_tsv, sep='\t', index=False)
 
+
+
+
+
+#---------- A partir daqui para baixo está errado 
+
+
+
+
 #---------------Essa parte irá calcular os taxons consistentes, ou seja: vai ler as colunas de taxons aumentados e diminuídos, cruzar ambas individualmente e uma contra a outra e retornar na coluna "Presenca" se o taxon está aumentado e/ou diminuído
 
 df = pd.read_csv('../final_merged_data.tsv', sep='\t')
@@ -210,25 +219,26 @@ for (taxa, origem), info in taxa_info.items():
 
 df_resultado = pd.DataFrame(resultados, columns=['Taxa', 'Contagem', 'Dataset', 'Origem'])
 
+#REMOVER ESSE FILTRO, SENÃO ELE SÓ VAI CONSIDERAR O TAXON A PARTIR DA CONTAGEM DE 2 E N VAI CONSIDERAR QDO ESTIVER AUMENTADO E AO MESMO TEMPO DIMINUÍDO E VAI GERAR RESULTADOS ERRADOS!!!
 # Filtrar para incluir apenas taxons com contagem >= 2
-df_filtrado = df_resultado.query("Contagem >= 2")
+#df_filtrado = df_resultado.query("Contagem >= 2")
 
-# Inicialização do dicionário para mapear a presença de cada taxa no df_filtrado
-presenca_taxa_filtrado = {}
+# Inicialização do dicionário para mapear a presença de cada taxa no df_resultado
+presenca_taxa = {}
 
-# Processamento do df_filtrado para determinar a presença de cada taxon
-for idx, row in df_filtrado.iterrows():
+# Processamento do df_resultado para determinar a presença de cada taxon
+for idx, row in df_resultado.iterrows():
     taxa = row['Taxa']
     origem = row['Origem']
-    # Atualiza o dicionário com a origem para cada taxon no df_filtrado
-    if taxa not in presenca_taxa_filtrado:
-        presenca_taxa_filtrado[taxa] = {origem}
+    # Atualiza o dicionário com a origem para cada taxon no df_resultado
+    if taxa not in presenca_taxa:
+        presenca_taxa[taxa] = {origem}
     else:
-        presenca_taxa_filtrado[taxa].add(origem)
+        presenca_taxa[taxa].add(origem)
 
-# Função para determinar a categoria de presença para cada taxon no df_filtrado
-def determinar_categoria_filtrado(taxa):
-    origens = presenca_taxa_filtrado[taxa]
+# Função para determinar a categoria de presença para cada taxon no df_resultado
+def determinar_categoria(taxa):
+    origens = presenca_taxa.get(taxa, set())
     if 'Enriched' in origens and 'Depleted' in origens:
         return 'Both'
     elif 'Enriched' in origens:
@@ -238,26 +248,26 @@ def determinar_categoria_filtrado(taxa):
     else:
         return 'Undetermined'  # Para segurança, caso algum taxon não caia nas categorias esperadas
 
-# Aplicação da função ao df_filtrado para criar a nova coluna 'Presença'
-df_filtrado['Presenca'] = df_filtrado['Taxa'].apply(determinar_categoria_filtrado)
+# Aplicação da função ao df_resultado para criar a nova coluna 'Presença'
+df_resultado['Presenca'] = df_resultado['Taxa'].apply(determinar_categoria)
 
-# Exibição do df_filtrado atualizado
-print(df_filtrado)
+# Exibição do df_resultado atualizado
+print(df_resultado)
 
 # Definindo o caminho completo para o arquivo TSV
 caminho_do_arquivo = '../resultado-ancombc-adultos-p-valor.tsv'
 
-# Salvando o DataFrame df_filtrado no arquivo TSV especificado
-df_filtrado.to_csv(caminho_do_arquivo, sep='\t', index=False)
+# Salvando o DataFrame df_resultado no arquivo TSV especificado
+df_resultado.to_csv(caminho_do_arquivo, sep='\t', index=False)
 
 #FAZENDO TABELA
 
 # Removendo duplicatas baseado na coluna correta e mantendo a primeira ocorrência
-# Substitua 'Taxa' pelo nome correto da coluna de taxas em df_filtrado, se necessário
-df_unico = df_filtrado.drop_duplicates(subset='Taxa')
+# Substitua 'Taxa' pelo nome correto da coluna de taxas em df_resultado, se necessário
+df_unico = df_resultado.drop_duplicates(subset='Taxa')
 
 # Criando um novo DataFrame com apenas as colunas 'Taxa', 'Contagem', e 'Presença'
-# Aqui, assumimos que o valor de 'Contagem' e 'Presença' são consistentes para cada 'Taxa' única no df_filtrado
+# Aqui, assumimos que o valor de 'Contagem' e 'Presença' são consistentes para cada 'Taxa' única no df_resultado
 df_final = df_unico[['Taxa', 'Contagem', 'Presenca']]
 
 # Exibindo o novo DataFrame com taxons únicos e suas respectivas contagens e presença
@@ -267,7 +277,7 @@ print(df_final)
 # Mudar o nome conforme arquivo
 caminho_do_arquivo = '../tabela-final-ancombc-adultos-sem-filtro.tsv'
 
-# Salvando o DataFrame df_filtrado no arquivo TSV especificado
+# Salvando o DataFrame df_resultado no arquivo TSV especificado
 df_final.to_csv(caminho_do_arquivo, sep='\t', index=False)
 
 #---------------Essa parte irá cruzar o dataframe final de bebês vs adultos 
