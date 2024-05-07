@@ -302,6 +302,32 @@ if 'Presenca' in df1.columns and 'Presenca' in df2.columns:
 else:
     print('A coluna "Presenca" não está presente em ambos os DataFrames.')
 
+#----------------Essa parte irá acrescentar a coluna "Datasets" para o arquivo final
+
+import pandas as pd
+
+# Carregue os arquivos "tabela-final" e "resultado-ancombc"
+df_tabela_final = pd.read_csv("../tabela-final-ancombc-bebes-sem-filtro.tsv", sep='\t')
+df_resultado_ancombc = pd.read_csv("../resultado-ancombc-bebes-semfiltro.tsv", sep='\t')
+
+# Crie um dicionário para mapear taxas aos datasets correspondentes
+taxa_datasets = {}
+for idx, row in df_resultado_ancombc.iterrows():
+    taxa = row["Taxa"]
+    dataset = row["Dataset"]
+    if taxa not in taxa_datasets:
+        taxa_datasets[taxa] = [dataset]
+    else:
+        taxa_datasets[taxa].append(dataset)
+
+# Adicione a coluna "Datasets" ao DataFrame "tabela-final"
+df_tabela_final["Datasets"] = df_tabela_final["Taxa"].map(taxa_datasets)
+
+# Salve o DataFrame atualizado em um novo arquivo
+df_tabela_final.to_csv("../tabela-final-com-dataset.tsv", sep='\t', index=False)
+
+
+
 #---------------Essa parte irá cruzar os dataframes já cruzados (bebês vs adultos) para retornar apenas os taxons consistentes
 
 import pandas as pd
