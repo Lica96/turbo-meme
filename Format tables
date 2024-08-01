@@ -3,83 +3,59 @@
 import pandas as pd
 
 # Carregando os dados
-df1 = pd.read_csv('../final_result_pval.tsv', sep='\t')
+df1 = pd.read_csv('/work/bipolar16s/liviacmg/qiime2BDFvsBPFP/REFEITOAPOSCUTADAPT/phyloseq/taxonomy_BDFvsBPFP.tsv', sep='\t')
 
 # Inicializando listas para armazenar os dados extraídos
+domain_list = []
 phylum_list = []
+class_list = []
+order_list = []
 family_list = []
 genus_list = []
+species_list = []
 
 # Iterando sobre cada linha do DataFrame"
 for index, row in df1.iterrows():
- taxa = row['Taxa']
+ taxa = row['taxonomy']
 # Extraindo as partes desejadas da string 'Taxa'
- phylum = taxa.split(';')[1][3:]  # Remove 'p__'
- family = taxa.split(';')[4][3:]  # Remove 'f__'
- genus = taxa.split(';')[5][3:]   # Remove 'g__'
-
+ domain = taxa.split(';')[0][3:]  # Remove 'd__'
+ if len(taxa.split(';')) > 1:   
+    phylum = taxa.split(';')[1][3:]  # Remove 'p__'
+ if len(taxa.split(';')) > 2:
+    class_taxa = taxa.split(';')[2][3:]   # Remove 'c__'
+ if len(taxa.split(';')) > 3:   
+    order = taxa.split(';')[3][3:]   # Remove 'o__'
+ if len(taxa.split(';')) > 4:
+    family = taxa.split(';')[4][3:]  # Remove 'f__'
+ if len(taxa.split(';')) > 5:
+    genus = taxa.split(';')[5][3:]   # Remove 'g__'
+ # Verificar se o índice necessário para species está disponível
+ if len(taxa.split(';')) > 6:
+    species = taxa.split(';')[6][3:]  # Remove 's__'
+    
 # Adicionando os dados extraídos às listas
+ domain_list.append(domain)
  phylum_list.append(phylum)
+ class_list.append(class_taxa)
+ order_list.append(order)
  family_list.append(family)
  genus_list.append(genus)
-
-
-# Criando um novo DataFrame com as colunas extraídas e a coluna 'presence'
-new_df = pd.DataFrame({
- 'phylum': phylum_list,
- 'family': family_list,
- 'genus': genus_list,
- 'presence': df1['Presence'],
- 'bebes': df1['Contagem_df1'].astype(str) + ' out of 5',
- 'adultos': df1['Contagem_df2'].astype(str) + ' out of 6'
-})
-  
-# Exibindo as primeiras linhas do novo DataFrame
-print(new_df.head())
-
-new_df.to_csv('../filtered_pval.tsv', index=False, sep='\t')
-
-#----Script atualizado
-
-#---Esse script irá extrair os dados de filo, família e gênero
-
-import pandas as pd
-
-# Carregando os dados
-df1 = pd.read_csv('../consistent_taxa.tsv', sep='\t')
-
-# Inicializando listas para armazenar os dados extraídos
-phylum_list = []
-family_list = []
-genus_list = []
-
-# Iterando sobre cada linha do DataFrame"
-for index, row in df1.iterrows():
- taxa = row['Taxa']
-# Extraindo as partes desejadas da string 'Taxa'
- phylum = taxa.split(';')[1][3:]  # Remove 'p__'
- family = taxa.split(';')[4][3:]  # Remove 'f__'
- genus = taxa.split(';')[5][3:]   # Remove 'g__'
-
-# Adicionando os dados extraídos às listas
- phylum_list.append(phylum)
- family_list.append(family)
- genus_list.append(genus)
+ species_list.append(species) 
 
 
 # Criando um novo DataFrame com as colunas extraídas 
 new_df = pd.DataFrame({
- 'Phylum': phylum_list,
- 'Family': family_list,
- 'Genus': genus_list,
- 'Contagem_bebes': df1['Contagem_bebes'].astype(str) + ' of 5',
- 'Contagem_adultos': df1['Contagem_adultos'].astype(str) + ' of 6',
- 'Origem': df1['Origem'],
- 'Datasets_bebes': df1['Datasets_bebes'],
- 'Datasets_adultos': df1['Datasets_adultos']
+  'otu': df1['otu'],
+ 'domain': domain_list,
+ 'phylum': phylum_list,
+ 'class': class_list,
+ 'order': order_list,
+ 'family': family_list,
+ 'genus': genus_list,
+ 'species': species_list
 })
   
 # Exibindo as primeiras linhas do novo DataFrame
 print(new_df.head())
 
-new_df.to_csv('../consistent_taxa_formatado.tsv', index=False, sep='\t')
+new_df.to_csv('/pathway/archive.tsv', index=False, sep='\t')
