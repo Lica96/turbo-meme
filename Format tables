@@ -3,7 +3,7 @@
 import pandas as pd
 
 # Carregando os dados
-df1 = pd.read_csv('/work/bipolar16s/liviacmg/qiime2BDFvsBPFP/REFEITOAPOSCUTADAPT/phyloseq/taxonomy_BDFvsBPFP.tsv', sep='\t')
+df1 = pd.read_csv('/pathway/taxonomy.tsv', sep='\t')
 
 # Inicializando listas para armazenar os dados extraídos
 domain_list = []
